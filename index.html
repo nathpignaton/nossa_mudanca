@@ -524,11 +524,20 @@ const DEF = {
 // ─── STATE ────────────────────────────────────────────────────────────────
 let D = load();
 let saveTimer = null;
-let calOffset = 0; // weeks from today
+let calOffset = 0;
 const COLOR = {aluguel:"#4F46E5",caucao:"#7C3AED",mudanca:"#D97706",compras:"#059669",servicos:"#0891B2"};
 
 function load(){
-  try{ const s=localStorage.getItem("_mud2"); if(s) return JSON.parse(s); }catch(e){}
+  try{
+    const s=localStorage.getItem("_mud2");
+    if(s){
+      const parsed=JSON.parse(s);
+      // Always use hardcoded credentials regardless of what's in localStorage
+      parsed.meta.binId=DEF.meta.binId;
+      parsed.meta.apiKey=DEF.meta.apiKey;
+      return parsed;
+    }
+  }catch(e){}
   return JSON.parse(JSON.stringify(DEF));
 }
 
@@ -541,7 +550,7 @@ function login(){
     document.getElementById("gate").style.display="none";
     document.getElementById("app").classList.add("on");
     renderAll();
-    if(D.meta.binId&&D.meta.apiKey) fetchCloud();
+    fetchCloud();
   } else {
     const el=document.getElementById("pwInput");
     el.classList.add("err");
@@ -552,7 +561,7 @@ function login(){
 if(sessionStorage.getItem("ok")){
   document.getElementById("gate").style.display="none";
   document.getElementById("app").classList.add("on");
-  setTimeout(()=>{ renderAll(); if(D.meta.binId&&D.meta.apiKey) fetchCloud(); },0);
+  setTimeout(()=>{ renderAll(); fetchCloud(); },0);
 }
 
 // ─── TABS ─────────────────────────────────────────────────────────────────
